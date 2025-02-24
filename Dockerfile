@@ -12,7 +12,7 @@ COPY src ./src
 # Build the application
 RUN gradle build -x test --no-daemon
 
-FROM eclipse-temurin:17-jre-alpine
+FROM amazoncorretto:17-alpine
 
 WORKDIR /app
 

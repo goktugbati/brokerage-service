@@ -1,10 +1,8 @@
-version: '3.8'
-
 services:
   # Application Service
   app:
     build:
-      context: docker
+      context: ..  # Go up one directory to the project root
       dockerfile: Dockerfile
     container_name: brokerage-app
     ports:
@@ -22,7 +20,7 @@ services:
       - brokerage-network
     restart: on-failure
     volumes:
-      - ./h2-data:/h2-data  # Optional: persist H2 data to a file database if needed
+      - ../h2-data:/h2-data  # Optional: persist H2 data to a file database if needed
 
   # Zookeeper (required for Kafka)
   zookeeper:
