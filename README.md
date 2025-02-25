@@ -38,6 +38,8 @@ The application implements two key resilience patterns to enhance system reliabi
 
 ## Technologies
 
+- **Liquibase**: Database migration and version control
+
 - **Spring Boot 3.x**: Core framework for the application
 - **Spring Security + JWT**: Authentication and authorization
 - **Spring Data JPA**: Data access layer
@@ -72,27 +74,6 @@ The application follows a clean architecture with clear separation of concerns:
 - `security`: JWT authentication and security utilities
 - `exception`: Exception handling
 
-
-## Running with Docker Compose
-
-To run the brokerage service along with Kafka and other dependencies, use Docker Compose:
-
-```bash
-docker-compose -f docker/docker-compose.yml up -d
-```
-
-For development mode, you can use:
-
-```bash
-docker-compose -f docker/docker-compose-dev.yml up -d
-```
-
-To stop the services:
-
-```bash
-docker-compose -f docker/docker-compose.yml down
-```
-
 ## Getting Started
 
 ### Prerequisites
@@ -100,6 +81,23 @@ docker-compose -f docker/docker-compose.yml down
 - Java 17+
 - Gradle 8.x
 - Kafka (optional for local development)
+
+
+### Database Migrations with Liquibase
+
+The application uses **Liquibase** to manage database migrations. When the application starts, Liquibase automatically applies necessary schema changes.
+
+To manually run migrations, use:
+
+```bash
+./gradlew update
+```
+
+To check pending changes before applying:
+
+```bash
+./gradlew diffChangeLog
+```
 
 ### Building the Application
 
@@ -119,14 +117,7 @@ By default, the application runs with the `dev` profile which initializes:
 - In-memory H2 database
 - H2 console available at `/h2-console`
 
-#
-## API Testing with Postman
-
-A **Postman collection** is available in the `doc/postman` directory to test API endpoints.
-
-Import the collection into Postman and use the predefined requests.
-
-## API Documentation
+### API Documentation
 
 When the application is running, access the Swagger UI documentation at:
 
