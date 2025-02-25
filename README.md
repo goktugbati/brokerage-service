@@ -11,7 +11,6 @@ This application follows a modern microservice-ready architecture with the follo
 - **Resilience Patterns**: Implements circuit breaker and retry mechanisms for enhanced system reliability
 - **Outbox Pattern**: Ensures reliable event publishing through an event outbox
 - **RESTful API**: Clean API endpoints with proper authorization and validation
-- **Caching Strategy**: Efficient caching using Caffeine to improve read performance
 
 ## Resilience Patterns
 
@@ -44,7 +43,6 @@ The application implements two key resilience patterns to enhance system reliabi
 - **Spring Data JPA**: Data access layer
 - **H2 Database**: In-memory database (configurable for production databases)
 - **Kafka**: Messaging system for event processing
-- **Caffeine Cache**: High-performance caching library
 - **Resilience4j**: Circuit breaker and retry patterns
 - **Gradle**: Build tool
 - **Lombok & MapStruct**: Reduce boilerplate code
@@ -74,6 +72,27 @@ The application follows a clean architecture with clear separation of concerns:
 - `security`: JWT authentication and security utilities
 - `exception`: Exception handling
 
+
+## Running with Docker Compose
+
+To run the brokerage service along with Kafka and other dependencies, use Docker Compose:
+
+```bash
+docker-compose -f docker/docker-compose.yml up -d
+```
+
+For development mode, you can use:
+
+```bash
+docker-compose -f docker/docker-compose-dev.yml up -d
+```
+
+To stop the services:
+
+```bash
+docker-compose -f docker/docker-compose.yml down
+```
+
 ## Getting Started
 
 ### Prerequisites
@@ -100,7 +119,14 @@ By default, the application runs with the `dev` profile which initializes:
 - In-memory H2 database
 - H2 console available at `/h2-console`
 
-### API Documentation
+#
+## API Testing with Postman
+
+A **Postman collection** is available in the `doc/postman` directory to test API endpoints.
+
+Import the collection into Postman and use the predefined requests.
+
+## API Documentation
 
 When the application is running, access the Swagger UI documentation at:
 

@@ -28,35 +28,35 @@ public class BrokerageServiceApplication {
     /**
      * Initialize admin user on application startup in dev environment
      */
-    @Bean
-    @Profile("!prod")
-    public CommandLineRunner initializeAdmin() {
-        return args -> {
-            log.info("Application running with profiles: {}", Arrays.toString(environment.getActiveProfiles()));
-
-            if (!customerService.existsByUsername("admin")) {
-                log.info("Creating default admin user");
-                Customer admin = customerService.createCustomer(
-                        "admin",
-                        "admin",
-                        "admin@brokerage.com",
-                        "System Administrator",
-                        true
-                );
-                log.info("Admin user created with ID: {}", admin.getId());
-            }
-
-            if (!customerService.existsByUsername("user")) {
-                log.info("Creating default regular user");
-                Customer user = customerService.createCustomer(
-                        "user",
-                        "password",
-                        "user@brokerage.com",
-                        "Regular User",
-                        false
-                );
-                log.info("Regular user created with ID: {}", user.getId());
-            }
-        };
-    }
+//    @Bean
+//    @Profile("!prod")
+//    public CommandLineRunner initializeAdmin() {
+//        return args -> {
+//            log.info("Application running with profiles: {}", Arrays.toString(environment.getActiveProfiles()));
+//
+//            if (!customerService.existsByUsername("admin")) {
+//                log.info("Creating default admin user");
+//                Customer admin = customerService.createCustomer(
+//                        "admin",
+//                        "admin",
+//                        "admin@brokerage.com",
+//                        "System Administrator",
+//                        true
+//                );
+//                log.info("Admin user created with ID: {}", admin.getId());
+//            }
+//
+//            if (!customerService.existsByUsername("user")) {
+//                log.info("Creating default regular user");
+//                Customer user = customerService.createCustomer(
+//                        "user",
+//                        "password",
+//                        "user@brokerage.com",
+//                        "Regular User",
+//                        false
+//                );
+//                log.info("Regular user created with ID: {}", user.getId());
+//            }
+//        };
+//    }
 }

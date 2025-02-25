@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="insert-initial-customers" author="brokerage-service">
+        <insert tableName="customers">
+            <column name="id" valueNumeric="1"/>
+            <column name="username">admin</column>
+            <column name="password">$2a$10$zYcFfdvk45caQgRMk3gHBeARkNOeARCl3EYM7zIAovfBe9VCpqcKO</column>
+            <column name="email">admin@brokerage.com</column>
+            <column name="full_name">System Administrator</column>
+            <column name="is_admin">true</column>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP()"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP()"/>
+        </insert>
+
+        <insert tableName="customers">
+            <column name="id" valueNumeric="2"/>
+            <column name="username">testUser</column>
+            <column name="password">$2a$10$Wv5PBjI6yH9n884YlctGaOtY38FsePwSnn3ACATRV17JFLm56Af2q</column>
+            <column name="email">user@brokerage.com</column>
+            <column name="full_name">Regular User</column>
+            <column name="is_admin">false</column>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP()"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP()"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="insert-initial-assets" author="brokerage-service">
+        <insert tableName="assets">
+            <column name="customer_id">1</column>
+            <column name="asset_name">TRY</column>
+            <column name="size">100000.00</column>
+            <column name="usable_size">10000.00</column>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP()"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP()"/>
+        </insert>
+
+        <insert tableName="assets">
+            <column name="customer_id">2</column>
+            <column name="asset_name">TRY</column>
+            <column name="size">100000.00</column>
+            <column name="usable_size">10000.00</column>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP()"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP()"/>
+        </insert>
+
+        <insert tableName="assets">
+            <column name="customer_id">2</column>
+            <column name="asset_name">MSFT</column>
+            <column name="size">500000.00</column>
+            <column name="usable_size">10000.00</column>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP()"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP()"/>
+        </insert>
+
+    </changeSet>
+</databaseChangeLog>

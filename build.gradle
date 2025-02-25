@@ -38,13 +38,16 @@ dependencies {
     // H2 Database - as per requirements
     runtimeOnly 'com.h2database:h2'
 
+    //Liquibase
+    implementation 'org.liquibase:liquibase-core'
+
     // JWT for Security
     implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
 
     // Caffeine Cache
-    implementation 'com.github.ben-manes.caffeine:caffeine'
+//    implementation 'com.github.ben-manes.caffeine:caffeine'
 
     // API Documentation
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="create-customers-table" author="brokerage-service">
+        <createTable tableName="customers">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="varchar(50)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(100)"/>
+            <column name="full_name" type="varchar(100)"/>
+            <column name="is_admin" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="bigint" defaultValueNumeric="0"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-assets-table" author="brokerage-service">
+        <createTable tableName="assets">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customer_id" type="bigint">
+                <constraints nullable="false"
+                             foreignKeyName="fk_asset_customer"
+                             references="customers(id)"/>
+            </column>
+            <column name="asset_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="size" type="decimal(19,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="usable_size" type="decimal(19,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="bigint" defaultValueNumeric="0"/>
+        </createTable>
+
+        <addUniqueConstraint
+                tableName="assets"
+                columnNames="customer_id, asset_name"
+                constraintName="ux_customer_asset"/>
+    </changeSet>
+
+    <changeSet id="create-orders-table" author="brokerage-service">
+        <createTable tableName="orders">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customer_id" type="bigint">
+                <constraints nullable="false"
+                             foreignKeyName="fk_order_customer"
+                             references="customers(id)"/>
+            </column>
+            <column name="asset_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_side" type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="size" type="decimal(19,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="decimal(19,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_date" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_date" type="timestamp"/>
+            <column name="version" type="bigint" defaultValueNumeric="0"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

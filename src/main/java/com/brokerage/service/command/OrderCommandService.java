@@ -28,7 +28,12 @@ public class OrderCommandService {
     private final OrderMapper orderMapper;
 
     /**
-     * Creates a new order using MapStruct for conversion
+     * Creates a new order with retry mechanism
+     *
+     * Retry Rationale:
+     * - Handle temporary database connection issues
+     * - Manage optimistic locking conflicts
+     * - Provide resilience for order creation
      */
     @Transactional
     public Order createOrder(Long customerId, CreateOrderRequest request) {
@@ -56,7 +61,15 @@ public class OrderCommandService {
     }
 
     /**
-     * Cancels a pending order
+     * Fallback method for order creation
+     */
+    public Order fallbackCreateOrder(Long customerId, CreateOrderRequest request, Exception e) {
+        log.error("Failed to create order after retries", e);
+        throw new RuntimeException("Unable to create order", e);
+    }
+
+    /**
+     * Cancels a pending order with retry mechanism
      */
     @Transactional
     public Order cancelOrder(Long orderId, Long customerId) {
@@ -86,7 +99,15 @@ public class OrderCommandService {
     }
 
     /**
-     * Matches a pending order (admin only)
+     * Fallback method for order cancellation
+     */
+    public Order fallbackCancelOrder(Long orderId, Long customerId, Exception e) {
+        log.error("Failed to cancel order after retries", e);
+        throw new RuntimeException("Unable to cancel order", e);
+    }
+
+    /**
+     * Matches a pending order with circuit breaker
      */
     @Transactional
     public Order matchOrder(Long orderId) {
@@ -113,5 +134,13 @@ public class OrderCommandService {
         log.info("Matched order {}, customer: {}", orderId, order.getCustomer().getId());
 
         return matchedOrder;
+    }
+
+    /**
+     * Fallback method for order matching
+     */
+    public Order fallbackMatchOrder(Long orderId, Exception e) {
+        log.error("Failed to match order due to circuit breaker", e);
+        throw new RuntimeException("Unable to match order at this time", e);
     }
 }

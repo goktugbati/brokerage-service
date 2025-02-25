@@ -17,7 +17,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    show-sql: true
+#    show-sql: true
 
   # H2 Console Configuration
   h2:
@@ -26,6 +26,12 @@ spring:
       path: /h2-console
       settings:
         web-allow-others: true  # Allow access from Docker
+
+  # Liquibase Configuration
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+    drop-first: true
 
   # Jackson Configuration
   jackson:
@@ -50,10 +56,10 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
   # Cache Configuration
-  cache:
-    type: caffeine
-    caffeine:
-      spec: maximumSize=500,expireAfterWrite=60s
+#  cache:
+#    type: caffeine
+#    caffeine:
+#      spec: maximumSize=500,expireAfterWrite=60s
 
 # Server Configuration
 server:
@@ -86,6 +92,7 @@ resilience4j:
         waitDurationInOpenState: 30s
         permittedNumberOfCallsInHalfOpenState: 3
         automaticTransitionFromOpenToHalfOpenEnabled: true
+
   retry:
     instances:
       kafkaPublishRetry:

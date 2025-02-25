@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 @Service
 @RequiredArgsConstructor
 public class AssetCommandService {
-
     private final AssetRepository assetRepository;
     private static final String TRY_ASSET = "TRY";
 
@@ -41,6 +40,14 @@ public class AssetCommandService {
                             .build();
                     return assetRepository.save(newAsset);
                 });
+    }
+
+    /**
+     * Fallback method for asset creation/update
+     */
+    public Asset fallbackCreateOrUpdateAsset(Customer customer, String assetName, BigDecimal size, Exception e) {
+        log.error("Failed to create or update asset after retries", e);
+        throw new RuntimeException("Unable to process asset operation", e);
     }
 
     /**
@@ -89,7 +96,7 @@ public class AssetCommandService {
     public void reserveTryForBuyOrder(Long customerId, BigDecimal size, BigDecimal price) {
         BigDecimal totalCost = size.multiply(price);
 
-        Asset tryAsset = assetRepository.findByCustomerIdAndAssetNameWithLock(customerId, TRY_ASSET)
+        Asset tryAsset = assetRepository.findByCustomerIdAndAssetName(customerId, TRY_ASSET)
                 .orElseThrow(() -> new AssetNotFoundException("Customer does not have TRY asset"));
 
         if (tryAsset.getUsableSize().compareTo(totalCost) < 0) {
@@ -103,11 +110,19 @@ public class AssetCommandService {
     }
 
     /**
+     * Fallback method for TRY reservation
+     */
+    public void fallbackReserveTryForBuyOrder(Long customerId, BigDecimal size, BigDecimal price, Exception e) {
+        log.error("Failed to reserve TRY after retries", e);
+        throw new RuntimeException("Unable to reserve TRY for buy order", e);
+    }
+
+    /**
      * Reserves asset for a sell order
      */
     @Transactional
     public void reserveAssetForSellOrder(Long customerId, String assetName, BigDecimal size) {
-        Asset asset = assetRepository.findByCustomerIdAndAssetNameWithLock(customerId, assetName)
+        Asset asset = assetRepository.findByCustomerIdAndAssetName(customerId, assetName)
                 .orElseThrow(() -> new AssetNotFoundException("Customer does not have " + assetName + " asset"));
 
         if (asset.getUsableSize().compareTo(size) < 0) {
@@ -127,7 +142,7 @@ public class AssetCommandService {
     public void releaseTryForBuyOrder(Long customerId, BigDecimal size, BigDecimal price) {
         BigDecimal totalCost = size.multiply(price);
 
-        Asset tryAsset = assetRepository.findByCustomerIdAndAssetNameWithLock(customerId, TRY_ASSET)
+        Asset tryAsset = assetRepository.findByCustomerIdAndAssetName(customerId, TRY_ASSET)
                 .orElseThrow(() -> new AssetNotFoundException("Customer does not have TRY asset"));
 
         tryAsset.setUsableSize(tryAsset.getUsableSize().add(totalCost));
@@ -141,7 +156,7 @@ public class AssetCommandService {
      */
     @Transactional
     public void releaseAssetForSellOrder(Long customerId, String assetName, BigDecimal size) {
-        Asset asset = assetRepository.findByCustomerIdAndAssetNameWithLock(customerId, assetName)
+        Asset asset = assetRepository.findByCustomerIdAndAssetName(customerId, assetName)
                 .orElseThrow(() -> new AssetNotFoundException("Customer does not have " + assetName + " asset"));
 
         asset.setUsableSize(asset.getUsableSize().add(size));
@@ -157,6 +172,12 @@ public class AssetCommandService {
     public void finalizeBuyOrder(Long customerId, String assetName, BigDecimal size, BigDecimal price) {
         BigDecimal totalCost = size.multiply(price);
 
+        Asset tryAsset = assetRepository.findByCustomerIdAndAssetName(customerId, TRY_ASSET)
+                .orElseThrow(() -> new AssetNotFoundException("Customer does not have TRY asset"));
+
+        tryAsset.setSize(tryAsset.getSize().subtract(totalCost));
+        assetRepository.save(tryAsset);
+
         Asset asset = assetRepository.findByCustomerIdAndAssetName(customerId, assetName)
                 .orElseGet(() -> {
                     Asset newAsset = Asset.builder()
@@ -168,15 +189,6 @@ public class AssetCommandService {
                     return assetRepository.save(newAsset);
                 });
 
-        // Update TRY asset
-        Asset tryAsset = assetRepository.findByCustomerIdAndAssetNameWithLock(customerId, TRY_ASSET)
-                .orElseThrow(() -> new AssetNotFoundException("Customer does not have TRY asset"));
-
-        // Already reserved during order creation, so just reduce the total size
-        tryAsset.setSize(tryAsset.getSize().subtract(totalCost));
-        assetRepository.save(tryAsset);
-
-        // Update the asset being bought
         asset.setSize(asset.getSize().add(size));
         asset.setUsableSize(asset.getUsableSize().add(size));
         assetRepository.save(asset);
@@ -191,15 +203,12 @@ public class AssetCommandService {
     public void finalizeSellOrder(Long customerId, String assetName, BigDecimal size, BigDecimal price) {
         BigDecimal totalValue = size.multiply(price);
 
-        // Update the asset being sold
-        Asset asset = assetRepository.findByCustomerIdAndAssetNameWithLock(customerId, assetName)
+        Asset asset = assetRepository.findByCustomerIdAndAssetName(customerId, assetName)
                 .orElseThrow(() -> new AssetNotFoundException("Customer does not have " + assetName + " asset"));
 
-        // Already reserved during order creation, so just reduce the total size
         asset.setSize(asset.getSize().subtract(size));
         assetRepository.save(asset);
 
-        // Update TRY asset
         Asset tryAsset = assetRepository.findByCustomerIdAndAssetName(customerId, TRY_ASSET)
                 .orElseThrow(() -> new AssetNotFoundException("Customer does not have TRY asset"));
 

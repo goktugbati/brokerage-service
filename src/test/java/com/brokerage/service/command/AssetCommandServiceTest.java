@@ -34,7 +34,7 @@ public class AssetCommandServiceTest {
     private Customer testCustomer;
     private Asset tryAsset;
     private Asset otherAsset;
-    private static final String TRY_ASSET = "TRY";
+    private static final String TRY_ASSET_NAME = "TRY";
     private static final String OTHER_ASSET_NAME = "AAPL"; // Used when testing selling assets
 
     @BeforeEach
@@ -50,7 +50,7 @@ public class AssetCommandServiceTest {
         tryAsset = Asset.builder()
                 .id(1L)
                 .customer(testCustomer)
-                .assetName(TRY_ASSET)
+                .assetName(TRY_ASSET_NAME)
                 .size(BigDecimal.valueOf(10000))
                 .usableSize(BigDecimal.valueOf(10000))
                 .createdAt(LocalDateTime.now())
@@ -75,10 +75,10 @@ public class AssetCommandServiceTest {
         when(assetRepository.save(any(Asset.class))).thenReturn(tryAsset);
         BigDecimal additionalSize = BigDecimal.valueOf(1000);
 
-        Asset result = assetCommandService.createOrUpdateAsset(testCustomer, TRY_ASSET, additionalSize);
+        Asset result = assetCommandService.createOrUpdateAsset(testCustomer, TRY_ASSET_NAME, additionalSize);
 
         assertNotNull(result);
-        assertEquals(TRY_ASSET, result.getAssetName());
+        assertEquals(TRY_ASSET_NAME, result.getAssetName());
 
         ArgumentCaptor<Asset> assetCaptor = ArgumentCaptor.forClass(Asset.class);
         verify(assetRepository).save(assetCaptor.capture());
@@ -118,7 +118,7 @@ public class AssetCommandServiceTest {
 
     @Test
     void reserveTryForBuyOrder_WhenSufficientFunds_ShouldReserveTry() {
-        when(assetRepository.findByCustomerIdAndAssetNameWithLock(anyLong(), eq(TRY_ASSET)))
+        when(assetRepository.findByCustomerIdAndAssetName(anyLong(), eq(TRY_ASSET_NAME)))
                 .thenReturn(Optional.of(tryAsset));
         when(assetRepository.save(any(Asset.class))).thenReturn(tryAsset);
 
@@ -138,7 +138,7 @@ public class AssetCommandServiceTest {
     @Test
     void reserveTryForBuyOrder_WhenInsufficientFunds_ShouldThrowException() {
         tryAsset.setUsableSize(BigDecimal.valueOf(400)); // Not enough for 500 cost
-        when(assetRepository.findByCustomerIdAndAssetNameWithLock(anyLong(), eq(TRY_ASSET)))
+        when(assetRepository.findByCustomerIdAndAssetName(anyLong(), eq(TRY_ASSET_NAME)))
                 .thenReturn(Optional.of(tryAsset));
         BigDecimal size = BigDecimal.valueOf(5);
         BigDecimal price = BigDecimal.valueOf(100);
@@ -150,7 +150,7 @@ public class AssetCommandServiceTest {
 
     @Test
     void reserveTryForBuyOrder_WhenAssetNotFound_ShouldThrowException() {
-        when(assetRepository.findByCustomerIdAndAssetNameWithLock(anyLong(), eq(TRY_ASSET)))
+        when(assetRepository.findByCustomerIdAndAssetName(anyLong(), eq(TRY_ASSET_NAME)))
                 .thenReturn(Optional.empty());
 
         BigDecimal size = BigDecimal.valueOf(5);
@@ -163,7 +163,7 @@ public class AssetCommandServiceTest {
 
     @Test
     void reserveAssetForSellOrder_WhenSufficientAssets_ShouldReserveAsset() {
-        when(assetRepository.findByCustomerIdAndAssetNameWithLock(anyLong(), eq(OTHER_ASSET_NAME)))
+        when(assetRepository.findByCustomerIdAndAssetName(anyLong(), eq(OTHER_ASSET_NAME)))
                 .thenReturn(Optional.of(otherAsset));
         when(assetRepository.save(any(Asset.class))).thenReturn(otherAsset);
 
@@ -181,13 +181,13 @@ public class AssetCommandServiceTest {
 
     @Test
     void reserveAssetsForOrder_ForBuyOrder_ShouldReserveTry() {
-        when(assetRepository.findByCustomerIdAndAssetNameWithLock(anyLong(), eq("TRY")))
+        when(assetRepository.findByCustomerIdAndAssetName(anyLong(), eq("TRY")))
                 .thenReturn(Optional.of(tryAsset));
         when(assetRepository.save(any(Asset.class))).thenReturn(tryAsset);
 
         assetCommandService.reserveAssetsForOrder(1L, "TRY", OrderSide.BUY, BigDecimal.valueOf(5), BigDecimal.valueOf(100));
 
-        verify(assetRepository).findByCustomerIdAndAssetNameWithLock(eq(1L), eq("TRY"));
+        verify(assetRepository).findByCustomerIdAndAssetName(eq(1L), eq("TRY"));
         verify(assetRepository).save(any(Asset.class));
     }
 
@@ -195,7 +195,7 @@ public class AssetCommandServiceTest {
     void finalizeBuyOrder_ShouldDecreaseTryAndIncreaseAsset() {
         when(assetRepository.findByCustomerIdAndAssetName(anyLong(), eq(OTHER_ASSET_NAME)))
                 .thenReturn(Optional.of(otherAsset));
-        when(assetRepository.findByCustomerIdAndAssetNameWithLock(anyLong(), eq(TRY_ASSET)))
+        when(assetRepository.findByCustomerIdAndAssetName(anyLong(), eq(TRY_ASSET_NAME)))
                 .thenReturn(Optional.of(tryAsset));
         when(assetRepository.save(any(Asset.class))).thenReturn(otherAsset).thenReturn(tryAsset);
 
@@ -209,9 +209,9 @@ public class AssetCommandServiceTest {
 
     @Test
     void finalizeSellOrder_ShouldDecreaseAssetAndIncreaseTry() {
-        when(assetRepository.findByCustomerIdAndAssetNameWithLock(anyLong(), eq(OTHER_ASSET_NAME)))
+        when(assetRepository.findByCustomerIdAndAssetName(anyLong(), eq(OTHER_ASSET_NAME)))
                 .thenReturn(Optional.of(otherAsset));
-        when(assetRepository.findByCustomerIdAndAssetName(anyLong(), eq(TRY_ASSET)))
+        when(assetRepository.findByCustomerIdAndAssetName(anyLong(), eq(TRY_ASSET_NAME)))
                 .thenReturn(Optional.of(tryAsset));
         when(assetRepository.save(any(Asset.class))).thenReturn(otherAsset).thenReturn(tryAsset);
 
