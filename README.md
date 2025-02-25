@@ -8,8 +8,34 @@ This application follows a modern microservice-ready architecture with the follo
 
 - **CQRS Pattern**: Command Query Responsibility Segregation separates read and write operations for performance and scalability
 - **Event-Driven Architecture**: Uses Kafka for asynchronous processing of order events
+- **Resilience Patterns**: Implements circuit breaker and retry mechanisms for enhanced system reliability
+- **Outbox Pattern**: Ensures reliable event publishing through an event outbox
 - **RESTful API**: Clean API endpoints with proper authorization and validation
 - **Caching Strategy**: Efficient caching using Caffeine to improve read performance
+
+## Resilience Patterns
+
+The application implements two key resilience patterns to enhance system reliability:
+
+### Circuit Breaker
+- Implemented using Resilience4j's CircuitBreaker
+- Monitors the health of event publishing to Kafka
+- Prevents system overload during temporary failures
+- Automatically transitions between open, half-open, and closed states
+- Configurable failure rate threshold and recovery mechanisms
+
+### Retry Mechanism
+- Automatic retry for transient failures
+- Exponential backoff strategy
+- Configurable maximum retry attempts
+- Handles specific exception types like Kafka exceptions and network timeouts
+
+### Outbox Pattern
+- Provides guaranteed event publishing for critical business events
+- Stores events in an outbox table before publishing
+- Periodically processes and publishes pending events
+- Ensures at-least-once delivery of events
+- Supports event replay and system recovery
 
 ## Technologies
 
@@ -19,6 +45,7 @@ This application follows a modern microservice-ready architecture with the follo
 - **H2 Database**: In-memory database (configurable for production databases)
 - **Kafka**: Messaging system for event processing
 - **Caffeine Cache**: High-performance caching library
+- **Resilience4j**: Circuit breaker and retry patterns
 - **Gradle**: Build tool
 - **Lombok & MapStruct**: Reduce boilerplate code
 - **Swagger/OpenAPI**: API documentation
@@ -31,6 +58,8 @@ This application follows a modern microservice-ready architecture with the follo
 - Asset inventory management with proper locking
 - Order lifecycle management (PENDING, MATCHED, CANCELED)
 - Admin functionality for order matching
+- Resilient event publishing with circuit breaker and retry
+- Event outbox for guaranteed message delivery
 
 ## Project Structure
 
