@@ -3,14 +3,12 @@ package com.brokerage.service;
 import com.brokerage.domain.Customer;
 import com.brokerage.exception.CustomerNotFoundException;
 import com.brokerage.repository.CustomerRepository;
-import com.brokerage.service.command.AssetCommandService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
@@ -19,24 +17,17 @@ import java.util.List;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
-    private final AssetCommandService assetCommandService;
     private final PasswordEncoder passwordEncoder;
-    private static final String TRY_ASSET = "TRY";
-    private static final BigDecimal INITIAL_TRY_BALANCE = new BigDecimal("10000.00");
-
-    // =============== Command Methods ===============
 
     /**
      * Creates a new customer
      */
     @Transactional
     public Customer createCustomer(String username, String password, String email, String fullName, boolean isAdmin) {
-        // Check if username already exists
         if (customerRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username already exists");
         }
 
-        // Create new customer
         Customer customer = Customer.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
@@ -46,9 +37,6 @@ public class CustomerService {
                 .build();
 
         Customer savedCustomer = customerRepository.save(customer);
-
-        // Add initial TRY balance
-        assetCommandService.createOrUpdateAsset(savedCustomer, TRY_ASSET, INITIAL_TRY_BALANCE);
 
         log.info("Created new customer: {}, isAdmin: {}", username, isAdmin);
 
@@ -85,7 +73,6 @@ public class CustomerService {
         log.info("Changed password for customer: {}", customer.getUsername());
     }
 
-    // =============== Query Methods ===============
 
     /**
      * Get all customers (admin only)

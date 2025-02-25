@@ -9,7 +9,6 @@ import com.brokerage.repository.AssetRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,7 +25,6 @@ public class AssetCommandService {
      * Creates or updates an asset for a customer
      */
     @Transactional
-    @CacheEvict(value = {"assets", "customerAssets"}, allEntries = true)
     public Asset createOrUpdateAsset(Customer customer, String assetName, BigDecimal size) {
         return assetRepository.findByCustomerAndAssetName(customer, assetName)
                 .map(existingAsset -> {
@@ -49,7 +47,6 @@ public class AssetCommandService {
      * Reserves assets for a new order
      */
     @Transactional
-    @CacheEvict(value = {"assets", "customerAssets"}, allEntries = true)
     public void reserveAssetsForOrder(Long customerId, String assetName, OrderSide side,
                                       BigDecimal size, BigDecimal price) {
         if (OrderSide.BUY.equals(side)) {
@@ -63,7 +60,6 @@ public class AssetCommandService {
      * Releases reserved assets when an order is cancelled
      */
     @Transactional
-    @CacheEvict(value = {"assets", "customerAssets"}, allEntries = true)
     public void releaseReservedAssets(Long customerId, String assetName, OrderSide side,
                                       BigDecimal size, BigDecimal price) {
         if (OrderSide.BUY.equals(side)) {
@@ -77,7 +73,6 @@ public class AssetCommandService {
      * Updates assets when an order is matched
      */
     @Transactional
-    @CacheEvict(value = {"assets", "customerAssets"}, allEntries = true)
     public void updateAssetsForMatchedOrder(Long customerId, String assetName, OrderSide side,
                                             BigDecimal size, BigDecimal price) {
         if (OrderSide.BUY.equals(side)) {

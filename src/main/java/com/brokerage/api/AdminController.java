@@ -1,16 +1,17 @@
 package com.brokerage.api;
 
+import com.brokerage.api.dto.request.AddAssetRequest;
 import com.brokerage.api.dto.request.CreateCustomerRequest;
 import com.brokerage.api.dto.request.MatchOrderRequest;
-import com.brokerage.api.dto.response.ApiResponse;
-import com.brokerage.api.dto.response.CustomerResponse;
-import com.brokerage.api.dto.response.OrderListResponse;
-import com.brokerage.api.dto.response.OrderResponse;
+import com.brokerage.api.dto.response.*;
+import com.brokerage.api.mapper.AssetMapper;
 import com.brokerage.api.mapper.CustomerMapper;
 import com.brokerage.api.mapper.OrderMapper;
+import com.brokerage.domain.Asset;
 import com.brokerage.domain.Customer;
 import com.brokerage.domain.Order;
 import com.brokerage.service.CustomerService;
+import com.brokerage.service.command.AssetCommandService;
 import com.brokerage.service.command.OrderCommandService;
 import com.brokerage.service.query.OrderQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,7 +39,9 @@ public class AdminController {
     private final OrderCommandService orderCommandService;
     private final OrderQueryService orderQueryService;
     private final CustomerMapper customerMapper;
+    private final AssetCommandService assetCommandService;
     private final OrderMapper orderMapper;
+    private final AssetMapper assetMapper;
 
     @GetMapping("/customers")
     @Operation(summary = "List customers", description = "List all customers (admin only)")
@@ -112,5 +115,25 @@ public class AdminController {
         OrderResponse response = orderMapper.toResponse(matchedOrder);
 
         return ResponseEntity.ok(new ApiResponse<>(true, "Order matched successfully", response));
+    }
+
+    @PostMapping("/customers/assets")
+    @Operation(summary = "Add asset to customer", description = "Add a new asset to a specific customer's portfolio (admin only)")
+    public ResponseEntity<ApiResponse<AssetResponse>> addAssetToCustomer(
+            @Valid @RequestBody AddAssetRequest request,
+            @RequestParam Long customerId) {
+
+        Customer customer = customerService.getCustomerById(customerId);
+        log.info("Admin adding asset {} to customer ID: {}", request.getAssetName(), customerId);
+
+        Asset newAsset = assetCommandService.createOrUpdateAsset(
+                customer,
+                request.getAssetName(),
+                request.getInitialSize()
+        );
+
+        AssetResponse response = assetMapper.toResponse(newAsset);
+
+        return ResponseEntity.ok(new ApiResponse<>(true, "Asset added successfully", response));
     }
 }

@@ -17,12 +17,11 @@ public interface CustomerMapper {
     @Mapping(target = "username", source = "username")
     @Mapping(target = "email", source = "email")
     @Mapping(target = "fullName", source = "fullName")
-    @Mapping(target = "isAdmin", source = "isAdmin")
+    @Mapping(target = "admin", source = "admin")
     CustomerResponse toResponse(Customer customer);
 
     List<CustomerResponse> toResponseList(List<Customer> customers);
     
-    // Note: We don't map the password here because it will be encoded separately
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

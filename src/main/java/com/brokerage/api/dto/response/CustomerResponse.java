@@ -14,5 +14,5 @@ public class CustomerResponse {
     private String username;
     private String email;
     private String fullName;
-    private boolean isAdmin;
+    private boolean admin;
 }

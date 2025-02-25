@@ -43,13 +43,6 @@ public class AssetController {
         log.info("Fetching assets for customer ID: {}", customerId);
 
         List<Asset> assets = assetQueryService.getAssetsByCustomerId(customerId);
-
-        if (assetName != null && !assetName.isEmpty()) {
-            assets = assets.stream()
-                    .filter(asset -> asset.getAssetName().equalsIgnoreCase(assetName))
-                    .collect(Collectors.toList());
-        }
-
         List<AssetResponse> assetResponses = assetMapper.toResponseList(assets);
 
         AssetListResponse response = AssetListResponse.builder()

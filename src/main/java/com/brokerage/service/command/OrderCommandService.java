@@ -14,7 +14,6 @@ import com.brokerage.repository.OrderRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -32,12 +31,10 @@ public class OrderCommandService {
      * Creates a new order using MapStruct for conversion
      */
     @Transactional
-    @CacheEvict(value = {"orders", "customerOrders"}, allEntries = true)
     public Order createOrder(Long customerId, CreateOrderRequest request) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
 
-        // Convert DTO to entity using MapStruct (validation happens here)
         Order order = orderMapper.toEntity(request, customer);
 
         assetCommandService.reserveAssetsForOrder(
@@ -62,7 +59,6 @@ public class OrderCommandService {
      * Cancels a pending order
      */
     @Transactional
-    @CacheEvict(value = {"orders", "customerOrders"}, allEntries = true)
     public Order cancelOrder(Long orderId, Long customerId) {
         Order order = orderRepository.findByIdAndCustomerId(orderId, customerId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
@@ -93,7 +89,6 @@ public class OrderCommandService {
      * Matches a pending order (admin only)
      */
     @Transactional
-    @CacheEvict(value = {"orders", "customerOrders"}, allEntries = true)
     public Order matchOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
