@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -42,7 +41,7 @@ public class Customer {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Asset> assets = new HashSet<>();
+    private Set<Asset> assets;
 
     @PrePersist
     protected void onCreate() {
