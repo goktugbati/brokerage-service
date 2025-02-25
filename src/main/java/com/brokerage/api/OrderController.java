@@ -1,12 +1,12 @@
 package com.brokerage.api;
 
 import com.brokerage.api.dto.request.CreateOrderRequest;
+import com.brokerage.api.dto.request.OrderFilterRequest;
 import com.brokerage.api.dto.response.ApiResponse;
 import com.brokerage.api.dto.response.OrderListResponse;
 import com.brokerage.api.dto.response.OrderResponse;
 import com.brokerage.api.mapper.OrderMapper;
 import com.brokerage.domain.Order;
-import com.brokerage.domain.OrderStatus;
 import com.brokerage.service.command.OrderCommandService;
 import com.brokerage.service.query.OrderQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,14 +15,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -58,27 +56,30 @@ public class OrderController {
     @Operation(summary = "List orders", description = "List orders with optional filters")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ApiResponse<OrderListResponse>> getOrders(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            @RequestParam(required = false) String status,
+            @Valid OrderFilterRequest filter,
             @AuthenticationPrincipal UserDetails userDetails) {
 
         Long customerId = customerHelper.getCustomerIdFromUserDetails(userDetails);
-        log.info("Fetching orders for customer ID: {}", customerId);
-
-        OrderStatus orderStatus = status != null ? OrderStatus.valueOf(status) : null;
+        log.info("Fetching orders for customer ID: {} with filters: {}", customerId, filter);
 
         List<Order> orders;
-        if (startDate != null && endDate != null) {
-            if (orderStatus != null) {
+        if (filter.getStartDate() != null) {
+            if (filter.getOrderStatus() != null) {
                 orders = orderQueryService.getOrdersByCustomerIdAndStatusAndDateRange(
-                        customerId, orderStatus, startDate, endDate);
+                        customerId,
+                        filter.getOrderStatus(),
+                        filter.getStartDate(),
+                        filter.getEndDate());
             } else {
                 orders = orderQueryService.getOrdersByCustomerIdAndDateRange(
-                        customerId, startDate, endDate);
+                        customerId,
+                        filter.getStartDate(),
+                        filter.getEndDate());
             }
-        } else if (orderStatus != null) {
-            orders = orderQueryService.getOrdersByCustomerIdAndStatus(customerId, orderStatus);
+        } else if (filter.getOrderStatus() != null) {
+            orders = orderQueryService.getOrdersByCustomerIdAndStatus(
+                    customerId,
+                    filter.getOrderStatus());
         } else {
             orders = orderQueryService.getOrdersByCustomerId(customerId);
         }

@@ -3,7 +3,6 @@ package com.brokerage.api;
 import com.brokerage.domain.Customer;
 import com.brokerage.security.SecurityUser;
 import com.brokerage.service.CustomerService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -11,11 +10,14 @@ import org.springframework.stereotype.Component;
  * Helper class for extracting customer information from security context
  */
 @Component
-@RequiredArgsConstructor
 public class CustomerHelper {
 
     private final CustomerService customerService;
-    
+
+    public CustomerHelper(CustomerService customerService) {
+        this.customerService = customerService;
+    }
+
     /**
      * Get customer ID from authenticated user details
      */

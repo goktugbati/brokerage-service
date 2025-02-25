@@ -50,7 +50,6 @@ public class OrderCommandService {
 
         Order savedOrder = orderRepository.save(order);
 
-        // Publish the order created event
         eventPublisher.publishOrderEvent(OrderCreatedEvent.fromOrder(savedOrder));
 
         log.info("Created {} order for {} {}, price: {}, customer: {}",
@@ -103,7 +102,6 @@ public class OrderCommandService {
             throw new OrderStatusException("Only pending orders can be matched");
         }
 
-        // Update the assets
         assetCommandService.updateAssetsForMatchedOrder(
                 order.getCustomer().getId(),
                 order.getAssetName(),
