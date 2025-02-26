@@ -1,4 +1,3 @@
-// OrderResponse.java
 package com.brokerage.api.dto.response;
 
 import com.brokerage.domain.OrderSide;
