@@ -30,11 +30,11 @@ The application implements two key resilience patterns to enhance system reliabi
 - Handles specific exception types like Kafka exceptions and network timeouts
 
 ### Outbox Pattern
-- Provides guaranteed event publishing for critical business events
-- Stores events in an outbox table before publishing
-- Periodically processes and publishes pending events
-- Ensures at-least-once delivery of events
-- Supports event replay and system recovery
+- Ensures reliable event publishing by storing **only failed events**.
+- Events are first attempted to be published to Kafka with **circuit breaker and retry mechanisms**.
+- If all retries fail or the circuit breaker is open, the event is **saved to the outbox** instead of being lost.
+- A separate process can then retry publishing these outbox events later, ensuring **eventual consistency**.
+- Prevents data loss in case of temporary Kafka failures or network issues.
 
 ## Technologies
 
