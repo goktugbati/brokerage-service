@@ -162,6 +162,7 @@ Admin-specific endpoints under `/api/admin/*` require ADMIN role.
 1. Automated Order Matching to replace manual admin intervention
 2. Implementing Sagas to maintain consistency in multi-step transactions.
 3. Review Kafka usage to see if synchronous order execution is better in some cases.
+4. Consider using distributed caching to lock assets during order execution.
 
 ## Production Deployment
 
