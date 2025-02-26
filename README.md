@@ -158,6 +158,11 @@ The application uses JWT tokens for authentication. All API endpoints except `/a
 
 Admin-specific endpoints under `/api/admin/*` require ADMIN role.
 
+## Improvement Ideas
+1. Automated Order Matching to replace manual admin intervention
+2. Implementing Sagas to maintain consistency in multi-step transactions.
+3. Review Kafka usage to see if synchronous order execution is better in some cases.
+
 ## Production Deployment
 
 For production deployment, configure the following:
@@ -174,6 +179,8 @@ Run the tests with:
 ```bash
 ./gradlew test
 ```
+
+
 
 ## License
 
