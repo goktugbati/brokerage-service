@@ -181,6 +181,14 @@ Run the tests with:
 ./gradlew test
 ```
 
+## API Testing with Postman
+
+A **Postman collection** is available in the `docs/postman` directory to test API endpoints.
+
+- Import the collection into Postman.
+- Set up the required environment variables (`baseUrl`, `adminToken`, `userToken`).
+- Use the predefined requests to test authentication, orders, assets, and admin operations.
+  """
 
 
 ## License
